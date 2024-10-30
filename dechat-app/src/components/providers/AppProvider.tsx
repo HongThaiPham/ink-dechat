@@ -7,22 +7,30 @@ import { ThemeProvider } from "./ThemeProvider";
 import { SiteHeader } from "../layout/SiteHeader";
 import WalletProvider from "./WalletProvider";
 import SiteFooter from "../layout/SiteFooter";
-const APP_NAME = "Polakdot Dapp Template";
+import DedotProvider from "./DedotProvider";
+import ContractProvider from "./ContractProvider";
+import { Toaster } from "../ui/sonner";
+const APP_NAME = "DeChat";
 const AppProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const walletAggregator = new WalletAggregator([
     new InjectedWalletProvider({}, APP_NAME),
   ]);
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <PolkadotWalletsContextProvider walletAggregator={walletAggregator}>
-        <WalletProvider>
-          <div className="relative flex min-h-screen flex-col">
-            <SiteHeader />
-            <div className="flex-1">{children}</div>
-            <SiteFooter />
-          </div>
-        </WalletProvider>
-      </PolkadotWalletsContextProvider>
+      <DedotProvider>
+        <PolkadotWalletsContextProvider walletAggregator={walletAggregator}>
+          <WalletProvider>
+            <ContractProvider>
+              <div className="relative flex min-h-screen flex-col">
+                <SiteHeader />
+                <div className="flex-1">{children}</div>
+                <SiteFooter />
+              </div>
+            </ContractProvider>
+          </WalletProvider>
+        </PolkadotWalletsContextProvider>
+      </DedotProvider>
+      <Toaster />
     </ThemeProvider>
   );
 };
