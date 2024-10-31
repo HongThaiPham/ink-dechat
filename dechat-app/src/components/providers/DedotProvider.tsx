@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { DedotClient, WsProvider } from "dedot";
-import { toast } from "sonner";
+import { toast } from "react-toastify";
 
 const DedotContext = createContext<{
   client: DedotClient | undefined;
@@ -25,8 +25,8 @@ const DedotProvider: React.FC<PropsWithChildren> = ({ children }) => {
       const wsProvider = new WsProvider(
         process.env.NEXT_PUBLIC_RPC_ENDPOINT as string
       );
-      const client = new DedotClient(wsProvider);
-      await client.connect();
+      const client = await DedotClient.new(wsProvider);
+      // await client.connect();
       console.log("Connected to dedot", client);
       setDedotClient(client);
     }
@@ -34,7 +34,7 @@ const DedotProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   useEffect(() => {
     toast.promise(initClient(), {
-      loading: "Initializing client",
+      pending: "Initializing client",
       success: "Initialized client",
       error: "Failed to initialize client",
     });

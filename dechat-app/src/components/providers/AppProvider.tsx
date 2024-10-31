@@ -8,30 +8,33 @@ import { SiteHeader } from "../layout/SiteHeader";
 import WalletProvider from "./WalletProvider";
 import SiteFooter from "../layout/SiteFooter";
 import DedotProvider from "./DedotProvider";
-import ContractProvider from "./ContractProvider";
-import { Toaster } from "../ui/sonner";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
 const APP_NAME = "DeChat";
+const queryClient = new QueryClient();
 const AppProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const walletAggregator = new WalletAggregator([
     new InjectedWalletProvider({}, APP_NAME),
   ]);
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <DedotProvider>
-        <PolkadotWalletsContextProvider walletAggregator={walletAggregator}>
-          <WalletProvider>
-            <ContractProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <DedotProvider>
+          <PolkadotWalletsContextProvider walletAggregator={walletAggregator}>
+            <WalletProvider>
               <div className="relative flex min-h-screen flex-col">
                 <SiteHeader />
                 <div className="flex-1">{children}</div>
                 <SiteFooter />
               </div>
-            </ContractProvider>
-          </WalletProvider>
-        </PolkadotWalletsContextProvider>
-      </DedotProvider>
-      <Toaster />
-    </ThemeProvider>
+            </WalletProvider>
+          </PolkadotWalletsContextProvider>
+        </DedotProvider>
+        <ToastContainer />
+      </ThemeProvider>
+    </QueryClientProvider>
   );
 };
 

@@ -20,10 +20,14 @@ interface WalletContextState {
   activeProvider?: BaseWallet;
   connectedAccounts: Account[];
   wallets?: BaseWallet[];
+  signer?: BaseWallet["signer"] | undefined;
+  selectedAccount?: Account | undefined;
+  setSelectedAccount: (account: Account) => void;
 }
 
 export const WalletContext = createContext<WalletContextState>({
   connectedAccounts: [],
+  setSelectedAccount: () => {},
 });
 
 const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
@@ -31,8 +35,13 @@ const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
     "PROVIDER",
     ""
   );
+  const [selectedAccount, setSelectedAccount] = useLocalStorage<
+    Account | undefined
+  >("SELECTED_ACCOUNT", undefined);
+
   const { wallets } = useWallets();
   const [connectedAccounts, setConnectedAccounts] = useState<Account[]>([]);
+
   const connect = useCallback(
     async (w: BaseWallet) => {
       await w.connect();
@@ -72,6 +81,11 @@ const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
     }
   }, [activeProvider, connect, selectedProvider]);
 
+  const signer = useMemo(() => {
+    if (!activeProvider) return undefined;
+    return activeProvider.signer;
+  }, [activeProvider]);
+
   useEffect(() => {
     reconnect();
   }, [reconnect, wallets]);
@@ -86,6 +100,9 @@ const WalletProvider: React.FC<PropsWithChildren> = ({ children }) => {
         activeProvider,
         connectedAccounts,
         wallets,
+        signer,
+        setSelectedAccount,
+        selectedAccount,
       }}
     >
       {children}
